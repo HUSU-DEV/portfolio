@@ -1,3 +1,53 @@
+// ── Helper: Generate and print CV via browser print dialog ──
+function _generateAndPrintCV(terminal) {
+  const d = DATA.owner;
+  const el = document.getElementById('cv-printable');
+
+  const allSkills = [
+    ...DATA.skills.languages,
+    ...DATA.skills.frameworks,
+    ...DATA.skills.tools,
+  ];
+
+  el.innerHTML = `
+    <p class="cv-name">${d.name}</p>
+    <p class="cv-meta">${d.role} &nbsp;&middot;&nbsp; ${d.location} &nbsp;&middot;&nbsp; ${d.email} &nbsp;&middot;&nbsp; ${d.github}</p>
+
+    <p class="cv-section-title">Experience</p>
+    ${DATA.experience.map(j => `
+      <div class="cv-entry">
+        <div class="cv-entry-title">${j.role} &mdash; ${j.company}</div>
+        <div class="cv-entry-sub">${j.period} &middot; ${j.location}</div>
+        <ul class="cv-bullets">${j.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+      </div>`).join('')}
+
+    <p class="cv-section-title">Education</p>
+    ${DATA.education.map(e => `
+      <div class="cv-entry">
+        <div class="cv-entry-title">${e.degree} &mdash; ${e.institution}</div>
+        <div class="cv-entry-sub">${e.year}${e.detail ? ' &middot; ' + e.detail : ''}</div>
+      </div>`).join('')}
+
+    <p class="cv-section-title">Projects</p>
+    ${DATA.projects.map(p => `
+      <div class="cv-entry">
+        <div class="cv-entry-title">${p.name}</div>
+        <div class="cv-entry-sub">${p.stack.join(', ')} &middot; ${p.status}</div>
+        <ul class="cv-bullets">${p.bullets.map(b => `<li>${b}</li>`).join('')}</ul>
+        ${p.github ? `<div class="cv-entry-sub">${p.github}</div>` : ''}
+      </div>`).join('')}
+
+    <p class="cv-section-title">Skills</p>
+    <div class="cv-skills">
+      ${allSkills.map(s => `<div class="cv-skill">&bull; ${s.name}</div>`).join('')}
+    </div>
+  `;
+
+  terminal.print('  Opening print dialog — select "Save as PDF" to download.', 'green');
+  terminal.print('  Tip: Portrait · A4/Letter · margins = None for best result.', 'green-muted');
+  setTimeout(() => window.print(), 600);
+}
+
 // ── Helper: ASCII skill bar ────────────────────────────────
 function _bar(level, max = 10) {
   return '[' + '█'.repeat(level) + '░'.repeat(max - level) + ']';
@@ -525,7 +575,9 @@ const COMMANDS = {
         );
         return;
       }
-      document.documentElement.dataset.theme = name === 'matrix' ? '' : name;
+      const val = name === 'matrix' ? '' : name;
+      document.documentElement.dataset.theme = val;
+      localStorage.setItem('portfolio-theme', val);
       terminal.print(`  Theme switched → ${name}`, 'green');
       terminal.print("  (Type 'theme matrix' to reset to default)", 'green-muted');
     },
@@ -536,6 +588,19 @@ const COMMANDS = {
     description: 'Display the ASCII name banner',
     hidden: false,
     execute(args, terminal) { _printBanner(terminal); },
+  },
+
+  // ---- download -------------------------------------------
+  download: {
+    description: 'Download CV as PDF: download cv',
+    hidden: false,
+    execute(args, terminal) {
+      if ((args[0] || '').toLowerCase() !== 'cv') {
+        terminal.print('  Usage: download cv', 'red');
+        return;
+      }
+      _generateAndPrintCV(terminal);
+    },
   },
 
   // ---- curl -----------------------------------------------

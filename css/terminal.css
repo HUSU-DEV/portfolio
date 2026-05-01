@@ -251,3 +251,94 @@
 .terminal-container.glitch-shake {
   animation: shake 0.45s ease-in-out 2;
 }
+
+/* ── CV printable region ──────────────────────────────────── */
+#cv-printable {
+  display: none;
+}
+
+@media print {
+  .scanlines,
+  .terminal-container,
+  .mobile-quickbar {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    overflow: visible !important;
+    display: block !important;
+    min-height: unset !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  #cv-printable {
+    display: block !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #111;
+  }
+
+  .cv-name {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0 0 4px;
+  }
+
+  .cv-meta {
+    color: #555;
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .cv-section-title {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 2px;
+    margin: 16px 0 8px;
+    color: #333;
+  }
+
+  .cv-entry {
+    margin-bottom: 10px;
+  }
+
+  .cv-entry-title {
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  .cv-entry-sub {
+    color: #666;
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  .cv-bullets {
+    margin: 3px 0 0 18px;
+    padding: 0;
+  }
+
+  .cv-bullets li {
+    list-style-type: disc;
+    margin-bottom: 1px;
+    font-size: 11px;
+  }
+
+  .cv-skills {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px 12px;
+  }
+
+  .cv-skill {
+    font-size: 11px;
+  }
+}

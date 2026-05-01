@@ -1,13 +1,26 @@
 // Typewriter engine — types text into DOM elements char by char.
-// Stateless IIFE module; all state lives in callers.
+// Supports skip: pass a skipState object from boot.js to allow instant-skip.
 const Typewriter = (() => {
 
-  // Types `text` into `element` at `speedMs` ms/char. Returns a Promise.
-  function type(element, text, speedMs = 18) {
+  // Types `text` into `element`. Respects skipState — dumps all chars immediately if skip=true.
+  function type(element, text, speedMs = 18, skipState = null) {
     return new Promise(resolve => {
       if (!text) { resolve(); return; }
+
+      if (skipState && skipState.skip) {
+        element.textContent = text;
+        resolve();
+        return;
+      }
+
       let i = 0;
       const tick = setInterval(() => {
+        if (skipState && skipState.skip) {
+          element.textContent = text;
+          clearInterval(tick);
+          resolve();
+          return;
+        }
         element.textContent += text[i];
         i++;
         if (i >= text.length) {
@@ -19,20 +32,33 @@ const Typewriter = (() => {
   }
 
   // Runs an array of sequence descriptors one after another.
-  // Each descriptor:
-  //   { text, delay?, speed?, color?, bold?, suffix?, suffixColor?, pre?, instant?, blank? }
-  // `container` is the DOM element to append lines to.
-  // `onComplete` called when all lines are done.
-  async function runSequence(sequences, container, onComplete) {
+  // Signature: runSequence(sequences, container, [skipState], onComplete)
+  // skipState is optional — omit for sequences that should never be skippable.
+  async function runSequence(sequences, container, skipState, onComplete) {
+    // Handle legacy call without skipState
+    if (typeof skipState === 'function') {
+      onComplete  = skipState;
+      skipState   = null;
+    }
+
     for (const seq of sequences) {
+      // Cancellable delay
       if (seq.delay) {
-        await new Promise(r => setTimeout(r, seq.delay));
+        if (skipState && skipState.skip) {
+          // already skipping — no delay needed
+        } else {
+          await new Promise(r => {
+            const t = setTimeout(r, seq.delay);
+            if (skipState) {
+              skipState._pendingDelay = () => { clearTimeout(t); r(); };
+            }
+          });
+          if (skipState) skipState._pendingDelay = null;
+        }
       }
 
       if (seq.blank || seq.text === '') {
-        const blank = document.createElement('div');
-        blank.className = 'line';
-        container.appendChild(blank);
+        container.appendChild(document.createElement('div'));
         container.scrollTop = container.scrollHeight;
         continue;
       }
@@ -46,10 +72,12 @@ const Typewriter = (() => {
       container.appendChild(line);
       container.scrollTop = container.scrollHeight;
 
-      if (seq.instant) {
+      const isSkipping = skipState && skipState.skip;
+
+      if (seq.instant || isSkipping) {
         line.textContent = seq.text;
       } else {
-        await type(line, seq.text, seq.speed || 18);
+        await type(line, seq.text, seq.speed || 18, skipState);
       }
 
       if (seq.suffix) {

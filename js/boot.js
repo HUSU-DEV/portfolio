@@ -4,36 +4,61 @@
 window.addEventListener('DOMContentLoaded', () => {
   const outputEl = document.getElementById('terminal-output');
 
-  // Instantiate terminal (binds events; input locked until init() is called)
+  // Restore saved color theme before anything renders
+  const savedTheme = localStorage.getItem('portfolio-theme') || '';
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+  // Instantiate terminal (events bound; input locked until init() is called)
   const terminal = new Terminal();
 
   // Hide cursor during boot
   document.getElementById('cursor-block').style.display = 'none';
 
+  // ── Skip state ───────────────────────────────────────────
+  const skipState = {
+    skip: false,
+    _pendingDelay: null,
+    triggerSkip() {
+      if (this.skip) return;
+      this.skip = true;
+      if (this._pendingDelay) {
+        this._pendingDelay();
+        this._pendingDelay = null;
+      }
+      if (hintEl.parentNode) hintEl.remove();
+    },
+  };
+
+  // Show skip hint at top of output
+  const hintEl = document.createElement('div');
+  hintEl.className = 'line color-green-muted';
+  hintEl.textContent = '  [Press any key or click to skip boot sequence...]';
+  outputEl.appendChild(hintEl);
+
+  const onSkip = () => skipState.triggerSkip();
+  document.addEventListener('keydown', onSkip);
+  document.addEventListener('click',   onSkip);
+
   // ── Boot sequence descriptors ────────────────────────────
   const SEP = '  ' + '─'.repeat(56);
   const sequences = [
-    // BIOS lines
-    { text: '  [BIOS v2.4.1] Initializing memory banks...............', speed: 14, color: 'green-dim',  suffix: ' OK',       suffixColor: 'green'     },
-    { text: '  [BIOS v2.4.1] Loading kernel modules...................', speed: 14, color: 'green-dim',  suffix: ' OK',       suffixColor: 'green'     },
-    { text: '  [BIOS v2.4.1] Mounting filesystem......................', speed: 14, color: 'green-dim',  suffix: ' OK',       suffixColor: 'green'     },
+    { text: '  [BIOS v2.4.1] Initializing memory banks...............', speed: 14, color: 'green-dim', suffix: ' OK',       suffixColor: 'green'  },
+    { text: '  [BIOS v2.4.1] Loading kernel modules...................', speed: 14, color: 'green-dim', suffix: ' OK',       suffixColor: 'green'  },
+    { text: '  [BIOS v2.4.1] Mounting filesystem......................', speed: 14, color: 'green-dim', suffix: ' OK',       suffixColor: 'green'  },
     { blank: true },
-    // OS banner
     { text: '  PORTFOLIO OS v1.0.0  —  Built with caffeine & keystrokes', speed: 22, color: 'amber', bold: true, delay: 120 },
     { blank: true },
-    // Status lines
-    { text: '  Scanning for recruiter presence.............', speed: 16, color: 'green-dim', suffix: ' DETECTED', suffixColor: 'amber',     suffixBold: true, delay: 60 },
-    { text: '  Loading personality matrix...................',  speed: 16, color: 'green-dim', suffix: ' LOADED',   suffixColor: 'green'      },
-    { text: '  Injecting charm subroutines.................',  speed: 16, color: 'green-dim', suffix: ' SUCCESS',  suffixColor: 'green'      },
-    { text: '  Checking coffee levels......................',   speed: 16, color: 'green-dim', suffix: ' CRITICAL', suffixColor: 'red'        },
+    { text: '  Scanning for recruiter presence.............', speed: 16, color: 'green-dim', suffix: ' DETECTED', suffixColor: 'amber', suffixBold: true, delay: 60 },
+    { text: '  Loading personality matrix...................',  speed: 16, color: 'green-dim', suffix: ' LOADED',   suffixColor: 'green' },
+    { text: '  Injecting charm subroutines.................',  speed: 16, color: 'green-dim', suffix: ' SUCCESS',  suffixColor: 'green' },
+    { text: '  Checking coffee levels......................',   speed: 16, color: 'green-dim', suffix: ' CRITICAL', suffixColor: 'red'   },
     { blank: true },
     { text: '  System ready. All cylinders firing.', speed: 20, color: 'green', delay: 80 },
     { blank: true },
     { text: SEP, instant: true, color: 'green-muted' },
     { blank: true },
-    // Welcome message
     { text: `  Welcome. You have found the portfolio of ${DATA.owner.name}.`, speed: 22, color: 'white', delay: 120 },
-    { text: `  ${DATA.owner.role}. Problem solver. Coffee-to-code converter.`, speed: 20, color: 'white' },
+    { text: `  ${DATA.owner.role}. Problem solver. Coffee-to-code converter.`,  speed: 20, color: 'white' },
     { blank: true },
     { text: "  Type 'help' to see all commands.", speed: 18, color: 'green-dim' },
     { text: "  Type 'whoami' to start. Or 'projects' to skip ahead.", speed: 18, color: 'green-dim' },
@@ -42,12 +67,16 @@ window.addEventListener('DOMContentLoaded', () => {
     { blank: true },
   ];
 
-  Typewriter.runSequence(sequences, outputEl, () => {
+  Typewriter.runSequence(sequences, outputEl, skipState, () => {
+    // Remove skip hint (in case it survived to natural end)
+    if (hintEl.parentNode) hintEl.remove();
+    document.removeEventListener('keydown', onSkip);
+    document.removeEventListener('click',   onSkip);
     terminal.init();
     setupKonami(terminal);
   });
 
-  // ── Konami code listener ────────────────────────────────
+  // ── Konami code listener ─────────────────────────────────
   function setupKonami(terminal) {
     const seq = [
       'ArrowUp','ArrowUp','ArrowDown','ArrowDown',

@@ -91,11 +91,10 @@ function _triggerNeo(terminal) {
   const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
   resize();
 
-  const cols   = Math.floor(canvas.width / 16);
-  const drops  = Array.from({ length: cols }, () => Math.random() * -50);
-  const chars  = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01234567890ABCDEF<>{}[]|\\/?';
-  const start  = Date.now();
-  let   rafId;
+  const cols  = Math.floor(canvas.width / 16);
+  const drops = Array.from({ length: cols }, () => Math.random() * -50);
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01234567890ABCDEF<>{}[]|\\/?';
+  const start = Date.now();
 
   function draw() {
     const elapsed = Date.now() - start;
@@ -119,14 +118,14 @@ function _triggerNeo(terminal) {
     });
 
     if (elapsed < 3500) {
-      rafId = requestAnimationFrame(draw);
+      requestAnimationFrame(draw);
     } else {
       canvas.style.opacity = '0';
       setTimeout(() => canvas.remove(), 1000);
     }
   }
 
-  rafId = requestAnimationFrame(draw);
+  requestAnimationFrame(draw);
 
   terminal.print('  Wake up, Neo...', 'green-dim');
   setTimeout(() => terminal.print('  The Matrix has you.', 'green'), 600);
@@ -158,12 +157,12 @@ function _triggerRmRf(terminal) {
     { b: '░░░░░░░░░░░░', n: '  0%', c: 'red'    },
   ];
 
-  terminal.printBlank();
+  setTimeout(() => terminal.printBlank(), delay);
   bars.forEach((bar, i) => {
     setTimeout(() => {
       terminal.print(`  System integrity: [${bar.b}] ${bar.n}`, bar.c);
       terminal.scrollToBottom();
-    }, delay + i * 380);
+    }, delay + 80 + i * 380);
   });
 
   const total = delay + bars.length * 380 + 200;

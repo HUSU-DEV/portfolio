@@ -1,0 +1,119 @@
+/* ── Mobile / Tablet ──────────────────────────────────── */
+@media (max-width: 640px) {
+  body {
+    align-items: flex-start;
+    overflow: hidden;
+  }
+
+  .terminal-container {
+    width: 100vw;
+    height: 100dvh;
+    height: 100vh; /* fallback */
+    margin: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    font-size: 12px;
+  }
+
+  .terminal-titlebar {
+    padding: 8px 12px;
+  }
+
+  .traffic-lights {
+    display: none;
+  }
+
+  .titlebar-version {
+    display: none;
+  }
+
+  .terminal-output {
+    padding: 10px 12px;
+  }
+
+  .terminal-inputline {
+    padding: 8px 12px;
+  }
+
+  /* Prevent zoom on input focus (iOS quirk) */
+  .hidden-input {
+    font-size: 16px;
+  }
+}
+
+/* ── Mobile quick-command bar ─────────────────────────── */
+.mobile-quickbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  background: #0d0d0d;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.mobile-quickbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--green-muted);
+  color: var(--green-dim);
+  font-family: inherit;
+  font-size: 11px;
+  border-radius: 3px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mobile-btn:active {
+  background: var(--green-muted);
+  color: var(--green);
+}
+
+/* Hide quick-bar on devices that support hover (desktops) */
+@media (hover: hover) {
+  .mobile-quickbar {
+    display: none;
+  }
+}
+
+/* ── Small landscape phones ───────────────────────────── */
+@media (max-height: 400px) and (orientation: landscape) {
+  .terminal-container {
+    font-size: 11px;
+  }
+
+  .terminal-titlebar {
+    padding: 4px 10px;
+  }
+
+  .terminal-output {
+    padding: 6px 10px;
+  }
+
+  .terminal-inputline {
+    padding: 5px 10px;
+  }
+}
+
+/* ── Reduce motion ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .scanlines,
+  .terminal-output,
+  .cursor-block {
+    animation: none;
+  }
+
+  .cursor-block {
+    opacity: 1;
+  }
+
+  .line {
+    animation: none;
+  }
+}

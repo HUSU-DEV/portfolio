@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Siddik Husamuddin — Frontend Developer Portfolio">
+  <meta name="author" content="Siddik Husamuddin">
+  <title>visitor@portfolio:~$</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/terminal.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <main class="terminal-container" id="terminal-container">
+    <div class="terminal-titlebar" role="banner">
+      <span class="traffic-lights" aria-hidden="true">
+        <span class="tl tl-red"></span>
+        <span class="tl tl-amber"></span>
+        <span class="tl tl-green"></span>
+      </span>
+      <span class="titlebar-text" id="titlebar-text">visitor@portfolio: ~</span>
+      <span class="titlebar-version" aria-hidden="true">TERM v1.0.0</span>
+    </div>
+
+    <div
+      class="terminal-output"
+      id="terminal-output"
+      role="log"
+      aria-live="polite"
+      aria-label="Terminal output"
+    ></div>
+
+    <div class="terminal-inputline" id="terminal-inputline">
+      <label class="prompt" id="prompt-text" for="terminal-input">visitor@portfolio:~$&nbsp;</label>
+      <div class="input-wrapper">
+        <span class="typed-text" id="typed-text" aria-hidden="true"></span>
+        <span class="cursor-block" id="cursor-block" aria-hidden="true"></span>
+        <input
+          type="text"
+          id="terminal-input"
+          class="hidden-input"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Terminal command input"
+        >
+      </div>
+    </div>
+  </main>
+
+  <!-- Load order matters: data → typewriter → commands → terminal → boot -->
+  <script src="js/data.js"></script>
+  <script src="js/typewriter.js"></script>
+  <script src="js/commands.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/boot.js"></script>
+</body>
+</html>

@@ -42,10 +42,15 @@ class Terminal {
 
     this.inputEl.addEventListener('keydown', e => {
       if (this.isLocked) return;
+
+      // Fallback for mobile devices and preventing unwanted page refreshes
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        e.preventDefault(); 
+        this._handleSubmit();
+        return;
+      }
+
       switch (e.key) {
-        case 'Enter':
-          this._handleSubmit();
-          break;
         case 'ArrowUp':
           this._historyUp(e);
           break;
@@ -267,7 +272,9 @@ class Terminal {
     });
 
     // Insert before input line
-    const inputLine = document.getElementById('terminal-inputline');
-    inputLine.parentNode.insertBefore(bar, inputLine);
+    const inputLine = document.getElementById('terminal-inputline') || document.querySelector('.terminal-inputline');
+    if (inputLine && inputLine.parentNode) {
+      inputLine.parentNode.insertBefore(bar, inputLine);
+    }
   }
 }
